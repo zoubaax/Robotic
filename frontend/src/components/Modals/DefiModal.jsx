@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useStore } from '../../store/useStore'
 import { calculatePoints } from '../../utils/stats'
-import { X, Check, AlertCircle, Users } from 'lucide-react'
+import { X, Check, AlertCircle, Users, Activity } from 'lucide-react'
 import { clsx } from 'clsx'
 
 export default function DefiModal({ defi, onClose }) {
@@ -22,83 +22,88 @@ export default function DefiModal({ defi, onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={onClose} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+      <div className="absolute inset-0 bg-brand-navy/40 backdrop-blur-sm transition-opacity animate-in fade-in" onClick={onClose} />
       
-      <div className="relative bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h3 className="text-2xl font-bold text-white">{defi.name}</h3>
-              <p className="text-slate-400 text-sm">{defi.base_points} pts de base • {defi.type}</p>
-            </div>
-            <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded-full text-slate-400 transition-colors">
+      <div className="relative bg-white border border-slate-200 rounded-lg w-full max-w-lg overflow-hidden shadow-[0_32px_64px_-12px_rgba(30,58,138,0.3)] animate-in zoom-in-95 duration-300">
+        <div className="bg-brand-navy p-8 text-white">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[10px] uppercase font-bold tracking-[0.4em] text-white/60">Module Assessment</span>
+            <button onClick={onClose} className="p-1 hover:bg-white/10 rounded transition-colors text-white/60 hover:text-white">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <h3 className="text-3xl font-semibold italic">{defi.name}</h3>
+          <p className="text-white/60 text-xs font-bold uppercase tracking-widest mt-4 flex items-center gap-2">
+            <Activity className="w-3 h-3" />
+            Standard Value: {defi.base_points} Points
+          </p>
+        </div>
+
+        <div className="p-8 space-y-8">
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              onClick={() => setStatus('PASS')}
+              className={clsx(
+                "py-5 rounded border-2 flex flex-col items-center gap-3 transition-all",
+                status === 'PASS' 
+                  ? "bg-emerald-50 border-emerald-500 text-emerald-600 shadow-sm" 
+                  : "bg-white border-slate-100 text-slate-400 hover:border-slate-200"
+              )}
+            >
+              <Check className="w-6 h-6" />
+              <span className="font-bold uppercase tracking-[0.2em] text-[10px]">Accomplished</span>
+            </button>
+
+            <button
+              onClick={() => setStatus('FAIL')}
+              className={clsx(
+                "py-5 rounded border-2 flex flex-col items-center gap-3 transition-all",
+                status === 'FAIL' 
+                  ? "bg-rose-50 border-rose-500 text-rose-600 shadow-sm" 
+                  : "bg-white border-slate-100 text-slate-400 hover:border-slate-200"
+              )}
+            >
               <X className="w-6 h-6" />
+              <span className="font-bold uppercase tracking-[0.2em] text-[10px]">Unsuccessful</span>
             </button>
           </div>
 
-          <div className="space-y-6">
-            <div className="flex gap-4">
-              <button
-                onClick={() => setStatus('PASS')}
-                className={clsx(
-                  "flex-1 py-4 rounded-2xl border-2 flex flex-col items-center gap-2 transition-all",
-                  status === 'PASS' 
-                    ? "bg-emerald-500/20 border-emerald-500 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.1)]" 
-                    : "bg-slate-800/50 border-slate-700 text-slate-500 hover:border-slate-600"
-                )}
-              >
-                <Check className="w-8 h-8" />
-                <span className="font-bold uppercase tracking-widest text-xs">RÉUSSI</span>
-              </button>
-
-              <button
-                onClick={() => setStatus('FAIL')}
-                className={clsx(
-                  "flex-1 py-4 rounded-2xl border-2 flex flex-col items-center gap-2 transition-all",
-                  status === 'FAIL' 
-                    ? "bg-rose-500/20 border-rose-500 text-rose-400 shadow-[0_0_20px_rgba(244,63,94,0.1)]" 
-                    : "bg-slate-800/50 border-slate-700 text-slate-500 hover:border-slate-600"
-                )}
-              >
-                <X className="w-8 h-8" />
-                <span className="font-bold uppercase tracking-widest text-xs">ÉCHOUÉ</span>
-              </button>
-            </div>
-
-            {defi.type === 'visitor-based' && status === 'PASS' && (
-              <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-300 mb-3">
-                  <Users className="w-4 h-4 text-indigo-400" />
-                  Nombre de visiteurs
-                </label>
+          {defi.type === 'visitor-based' && status === 'PASS' && (
+            <div className="bg-brand-light p-6 rounded border border-slate-200">
+              <label className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">
+                <Users className="w-3.5 h-3.5 text-brand-blue" />
+                Visitor Count Metric
+              </label>
+              <div className="flex items-center gap-4">
                 <input
                   type="number"
                   min="0"
                   value={visitors}
                   onChange={(e) => setVisitors(parseInt(e.target.value) || 0)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all text-2xl font-bold text-center"
+                  className="w-full bg-white border border-slate-200 rounded px-5 py-3 text-brand-navy focus:outline-none focus:border-brand-blue transition-all text-2xl font-bold text-center"
                 />
-                <p className="text-right mt-2 text-xs font-bold text-indigo-400">
-                  Total: {visitors * 15} pts
-                </p>
+                <div className="flex flex-col items-end">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Yield</span>
+                  <span className="text-xl font-bold text-brand-blue">{visitors * 15} pts</span>
+                </div>
               </div>
-            )}
-
-            <div className="flex items-center gap-3 p-4 bg-indigo-500/5 border border-indigo-500/20 rounded-xl text-indigo-300/80 text-sm">
-              <AlertCircle className="w-5 h-5 flex-shrink-0" />
-              <p>Le résultat sera mis à jour en temps réel sur le tableau de bord.</p>
             </div>
+          )}
+
+          <div className="flex items-start gap-4 p-5 bg-brand-light border border-slate-200 rounded text-slate-500 text-xs leading-relaxed">
+            <AlertCircle className="w-4 h-4 text-brand-blue flex-shrink-0 mt-0.5" />
+            <p>Data integrity: Submission will immediately synchronize with the central leaderboard and update academic rankings.</p>
           </div>
         </div>
 
-        <div className="p-6 bg-slate-800/30 border-t border-slate-800">
+        <div className="p-8 pt-0">
           <button
             onClick={handleSave}
             disabled={saving}
-            className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-indigo-500/20 active:scale-[0.98]"
+            className="w-full bg-brand-navy hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded text-xs uppercase tracking-[0.2em] transition-all shadow-xl shadow-brand-navy/10 active:scale-[0.98]"
           >
-            {saving ? 'Enregistrement...' : 'Confirmer le Résultat'}
+            {saving ? 'Synchronizing...' : 'Submit Records'}
           </button>
         </div>
       </div>

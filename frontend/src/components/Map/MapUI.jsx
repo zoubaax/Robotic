@@ -1,8 +1,7 @@
 import { useStore } from '../../store/useStore'
-import { MapPin, CheckCircle2, XCircle, HelpCircle } from 'lucide-react'
+import { MapPin, CheckCircle2, XCircle, Info } from 'lucide-react'
 import { clsx } from 'clsx'
 
-// Mock coordinates for the "map"
 const DEFI_POSITIONS = {
   'Rocane': { x: '15%', y: '20%' },
   'Rond-point': { x: '45%', y: '15%' },
@@ -25,24 +24,25 @@ export default function MapUI({ onSelectDefi }) {
   }
 
   return (
-    <div className="relative w-full aspect-[16/9] bg-slate-950 rounded-3xl overflow-hidden border border-slate-800 shadow-2xl group">
-      {/* Background decoration */}
-      <div className="absolute inset-0 opacity-20" 
+    <div className="relative w-full h-full bg-slate-50 rounded border border-slate-200 overflow-hidden shadow-sm group">
+      {/* Technical Grid Background */}
+      <div className="absolute inset-0 opacity-[0.03]" 
         style={{ 
-          backgroundImage: 'radial-gradient(circle at 2px 2px, #334155 1px, transparent 0)',
-          backgroundSize: '40px 40px' 
+          backgroundImage: 'linear-gradient(#1e3a8a 1px, transparent 1px), linear-gradient(90deg, #1e3a8a 1px, transparent 1px)',
+          backgroundSize: '20px 20px' 
         }} 
       />
       
-      <div className="absolute inset-0 bg-gradient-to-tr from-slate-950 via-slate-900 to-indigo-950/30" />
-      
-      {/* Visual paths (decorative) */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20">
+      {/* Decorative Blueprint Lines */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-10">
         <path d="M 15% 20% L 45% 15% L 75% 25% L 80% 60% L 45% 80% L 20% 55% L 50% 45% Z" 
-          fill="none" stroke="currentColor" strokeWidth="2" className="text-indigo-500" strokeDasharray="8 8" />
+          fill="none" stroke="#1e3a8a" strokeWidth="1" strokeDasharray="5 5" />
+        <circle cx="15%" cy="20%" r="2" fill="#1e3a8a" />
+        <circle cx="45%" cy="15%" r="2" fill="#1e3a8a" />
+        <circle cx="75%" cy="25%" r="2" fill="#1e3a8a" />
       </svg>
 
-      {/* Defi Markers */}
+      {/* Defi Markers - Technical Style */}
       {defis.map((defi) => {
         const pos = DEFI_POSITIONS[defi.name] || { x: '50%', y: '50%' }
         const status = getDefiStatus(defi.id)
@@ -54,41 +54,46 @@ export default function MapUI({ onSelectDefi }) {
             disabled={!selectedTeamId}
             style={{ left: pos.x, top: pos.y }}
             className={clsx(
-              "absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-2 group/marker transition-all duration-300",
-              !selectedTeamId ? "opacity-50 cursor-not-allowed" : "hover:scale-110"
+              "absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group/marker transition-all duration-300",
+              !selectedTeamId ? "opacity-30 cursor-not-allowed" : "hover:scale-110 active:scale-95"
             )}
           >
             <div className={clsx(
-              "p-2 rounded-xl border-2 shadow-lg transition-all",
-              status === 'PASS' ? "bg-emerald-500/20 border-emerald-500 text-emerald-400" :
-              status === 'FAIL' ? "bg-rose-500/20 border-rose-500 text-rose-400" :
-              "bg-slate-800 border-slate-600 text-slate-400 group-hover/marker:border-indigo-400 group-hover/marker:text-indigo-300"
+              "w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all bg-white shadow-md",
+              status === 'PASS' ? "border-emerald-500 text-emerald-500 bg-emerald-50" :
+              status === 'FAIL' ? "border-rose-500 text-rose-500 bg-rose-50" :
+              "border-slate-300 text-slate-400 group-hover/marker:border-brand-blue group-hover/marker:text-brand-blue"
             )}>
-              {status === 'PASS' ? <CheckCircle2 className="w-6 h-6" /> :
-               status === 'FAIL' ? <XCircle className="w-6 h-6" /> :
-               <MapPin className="w-6 h-6" />}
+              {status === 'PASS' ? <CheckCircle2 className="w-5 h-5" /> :
+               status === 'FAIL' ? <XCircle className="w-5 h-5" /> :
+               <MapPin className="w-5 h-5" />}
             </div>
             
-            <div className="bg-slate-900/90 backdrop-blur px-2 py-1 rounded-md border border-slate-700 text-[10px] font-bold text-white uppercase tracking-wider shadow-xl opacity-0 group-hover/marker:opacity-100 transition-opacity whitespace-nowrap">
-              {defi.name} ({defi.base_points} pts)
+            <div className="mt-2 bg-brand-navy text-white text-[8px] font-bold px-2 py-0.5 rounded shadow-lg uppercase tracking-widest opacity-0 group-hover/marker:opacity-100 transition-opacity whitespace-nowrap z-20">
+              {defi.name}
             </div>
           </button>
         )
       })}
 
       {!selectedTeamId && (
-        <div className="absolute inset-0 flex items-center justify-center bg-slate-950/40 backdrop-blur-[2px] z-10">
-          <div className="bg-slate-900/90 border border-slate-700 p-6 rounded-2xl flex flex-col items-center gap-4 text-center shadow-2xl">
-            <HelpCircle className="w-12 h-12 text-indigo-400 animate-pulse" />
-            <p className="text-slate-300 font-medium">Sélectionnez une équipe pour commencer</p>
+        <div className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-[1px] z-30">
+          <div className="bg-white border border-slate-200 p-8 rounded shadow-2xl flex flex-col items-center gap-4 text-center max-w-xs">
+            <div className="w-12 h-12 bg-brand-light rounded-full flex items-center justify-center">
+              <Info className="w-6 h-6 text-brand-blue" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-brand-navy uppercase tracking-wider mb-2">Protocol Required</h4>
+              <p className="text-xs text-slate-500 leading-relaxed">Please select a participating team from the registry to initialize the challenge map.</p>
+            </div>
           </div>
         </div>
       )}
       
-      <div className="absolute bottom-4 left-6 flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-slate-500">
-        <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-500" /> Réussi</div>
-        <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-rose-500" /> Échoué</div>
-        <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-slate-600" /> À faire</div>
+      <div className="absolute bottom-6 left-8 flex items-center gap-6 text-[9px] font-bold uppercase tracking-widest text-slate-400">
+        <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-500" /> Success</div>
+        <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-rose-500" /> Failure</div>
+        <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-slate-300" /> Pending</div>
       </div>
     </div>
   )
