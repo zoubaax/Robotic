@@ -5,6 +5,8 @@ import { clsx } from 'clsx'
 import { Link } from 'react-router-dom'
 import LiveTimer from '../components/UI/LiveTimer'
 import mapImage from '../assets/map.jpeg'
+import upfLogo from '../assets/upf-logo.png'
+import clubLogo from '../assets/UPF LOGO CLUBS-robotique-09.png'
 
 const DEFAULT_POSITIONS = {
   'Stop':        { x: 89, y: 29 },
@@ -55,9 +57,11 @@ export default function LivePage() {
       {/* Header */}
       <header className="h-24 border-b border-slate-100 flex items-center justify-between px-10 bg-white/80 backdrop-blur-md sticky top-0 z-30">
         <div className="flex items-center gap-6">
-          <div className="w-12 h-12 bg-brand-navy rounded-lg flex items-center justify-center shadow-lg">
-            <Trophy className="text-white w-6 h-6" />
-          </div>
+          <img src={upfLogo} alt="UPF Logo" className="h-12 w-auto" />
+          <img src={clubLogo} alt="Club Logo" className="h-12 w-auto" />
+          
+          <div className="h-10 w-[1px] bg-slate-200" />
+          
           <div>
             <div className="text-[10px] uppercase font-bold tracking-[0.3em] text-brand-blue mb-0.5">Academic Engineering</div>
             <h1 className="text-2xl font-semibold text-brand-navy tracking-tight uppercase">
@@ -115,12 +119,12 @@ export default function LivePage() {
             </div>
           )}
 
-          <Link
+          {/* <Link
             to="/login"
             className="text-[10px] font-bold text-slate-300 hover:text-brand-blue uppercase tracking-widest transition-colors"
           >
             Admin
-          </Link>
+          </Link> */}
         </div>
       </header>
 

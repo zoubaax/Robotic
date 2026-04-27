@@ -10,6 +10,8 @@ import LiveTimer from '../components/UI/LiveTimer'
 import { Clock, Trophy, LayoutDashboard, Settings, User, LogOut } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useNavigate } from 'react-router-dom'
+import upfLogo from '../assets/upf-logo.png'
+import clubLogo from '../assets/UPF LOGO CLUBS-robotique-09.png'
 
 export default function Dashboard() {
   useReveal()
@@ -52,10 +54,10 @@ export default function Dashboard() {
       {/* Sidebar Navigation */}
       <nav className="fixed left-0 top-0 bottom-0 w-24 bg-brand-navy border-r border-white/10 flex flex-col items-center py-10 gap-10 z-40">
         <div className="reveal-element">
-          <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-lg mb-2">
-            <Trophy className="text-brand-navy w-6 h-6" />
+          <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center shadow-lg mb-2 overflow-hidden p-1">
+            <img src={clubLogo} alt="Club Logo" className="w-full h-full object-contain" />
           </div>
-          <div className="text-[8px] text-white/40 font-bold uppercase tracking-[0.2em] text-center">UPF</div>
+          <div className="text-[8px] text-white/40 font-bold uppercase tracking-[0.2em] text-center">Robotique</div>
         </div>
         
         <div className="flex flex-col gap-6 reveal-element delay-100">
@@ -73,6 +75,10 @@ export default function Dashboard() {
         {/* Header */}
         <header className="h-24 border-b border-slate-100 flex items-center justify-between px-10 bg-white/80 backdrop-blur-md sticky top-0 z-30">
           <div className="flex items-center gap-6 reveal-element">
+            <img src={upfLogo} alt="UPF Logo" className="h-12 w-auto" />
+            
+            <div className="h-10 w-[1px] bg-slate-200" />
+            
             <div>
               <div className="text-[10px] uppercase font-bold tracking-[0.3em] text-brand-blue mb-0.5">Academic Engineering</div>
               <h1 className="text-2xl font-semibold text-brand-navy tracking-tight uppercase">
