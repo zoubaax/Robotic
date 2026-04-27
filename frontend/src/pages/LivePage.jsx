@@ -22,10 +22,13 @@ const DEFAULT_POSITIONS = {
 }
 
 export default function LivePage() {
-  const { teams, defis, fetchTeams, fetchDefis, fetchLiveState, subscribeToChanges, liveTeamId, visitorCount, markerPositions } = useStore()
+  const { teams, defis, fetchTeams, fetchDefis, fetchLiveState, subscribeToChanges, liveTeamId, visitorCount } = useStore()
   
-  // Merge default positions with synced ones from DB
-  const positions = { ...DEFAULT_POSITIONS, ...markerPositions }
+  // Show the team the admin has selected
+  const displayTeam = teams.find(t => t.id === liveTeamId)
+
+  // Merge default positions with this specific team's calibration
+  const positions = { ...DEFAULT_POSITIONS, ...(displayTeam?.marker_positions || {}) }
 
   useEffect(() => {
     fetchTeams()
@@ -35,8 +38,6 @@ export default function LivePage() {
     return () => unsubscribe()
   }, [])
 
-  // Show the team the admin has selected
-  const displayTeam = teams.find(t => t.id === liveTeamId)
   const isRunning = displayTeam?.start_time && !displayTeam?.end_time && !displayTeam?.paused_at
   const isPaused = displayTeam?.paused_at
 

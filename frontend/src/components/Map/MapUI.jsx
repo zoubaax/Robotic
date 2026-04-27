@@ -17,7 +17,7 @@ const DEFAULT_POSITIONS = {
 }
 
 export default function MapUI({ onSelectDefi }) {
-  const { defis, selectedTeamId, teams, visitorCount, setVisitorCount, markerPositions, setMarkerPositions, showNotification } = useStore()
+  const { defis, selectedTeamId, teams, visitorCount, setVisitorCount, setMarkerPositions, showNotification } = useStore()
   const selectedTeam = teams.find(t => t.id === selectedTeamId)
   const results = selectedTeam?.team_defi_results || []
 
@@ -26,12 +26,14 @@ export default function MapUI({ onSelectDefi }) {
   const [dragging, setDragging] = useState(null)
   const containerRef = useRef(null)
 
-  // Initialize positions from store
+  // Initialize positions from the currently selected team
   useEffect(() => {
-    if (markerPositions && Object.keys(markerPositions).length > 0) {
-      setPositions(prev => ({ ...prev, ...markerPositions }))
+    if (selectedTeam?.marker_positions) {
+      setPositions({ ...DEFAULT_POSITIONS, ...selectedTeam.marker_positions })
+    } else {
+      setPositions({ ...DEFAULT_POSITIONS })
     }
-  }, [markerPositions])
+  }, [selectedTeamId, selectedTeam?.marker_positions])
 
   const handleVisitorCount = (n) => {
     setVisitorCount(n)
@@ -83,9 +85,10 @@ export default function MapUI({ onSelectDefi }) {
   }, [dragging])
 
   const savePositions = async () => {
-    await setMarkerPositions(positions)
+    if (!selectedTeamId) return
+    await setMarkerPositions(selectedTeamId, positions)
     setCalibrating(false)
-    showNotification('Positions synchronisées en direct !')
+    showNotification('Positions synchronisées pour cette équipe !')
   }
 
   const resetPositions = () => {

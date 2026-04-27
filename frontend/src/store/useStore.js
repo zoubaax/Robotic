@@ -15,7 +15,6 @@ export const useStore = create((set, get) => ({
   selectedTeamId: null,
   liveTeamId: null,
   visitorCount: 0,
-  markerPositions: {},
   user: JSON.parse(localStorage.getItem('admin_user') || 'null'),
   loading: false,
   error: null,
@@ -89,17 +88,24 @@ export const useStore = create((set, get) => ({
     console.log('Live state fetched:', data)
     set({ 
       liveTeamId: data.selected_team_id,
-      visitorCount: data.visitor_count || 0,
-      markerPositions: data.marker_positions || {}
+      visitorCount: data.visitor_count || 0
     })
   },
 
-  setMarkerPositions: async (positions) => {
-    set({ markerPositions: positions })
-    await supabase
-      .from('live_state')
-      .update({ marker_positions: positions, updated_at: new Date().toISOString() })
-      .eq('id', 1)
+  setMarkerPositions: async (teamId, positions) => {
+    const { error } = await supabase
+      .from('teams')
+      .update({ marker_positions: positions })
+      .eq('id', teamId)
+
+    if (error) {
+      set({ error: error.message })
+      return false
+    }
+
+    // Refresh teams to get the new positions
+    await get().fetchTeams()
+    return true
   },
 
   setVisitorCount: async (count) => {
