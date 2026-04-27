@@ -6,6 +6,7 @@ export const useStore = create((set, get) => ({
   defis: [],
   results: [],
   selectedTeamId: null,
+  user: JSON.parse(localStorage.getItem('admin_user') || 'null'),
   loading: false,
   error: null,
 
@@ -132,6 +133,46 @@ export const useStore = create((set, get) => ({
     }
     await get().fetchTeams()
     return data[0]
+  },
+
+  login: async (email, password) => {
+    const cleanEmail = email.trim()
+    const cleanPassword = password.trim()
+    
+    console.log('Attempting login for:', cleanEmail)
+
+    // 1. HARDCODED FALLBACK (Works even without database)
+    if (cleanEmail === 'Admin@robotics.upf' && cleanPassword === 'Urbotics@26') {
+      console.log('Login successful via master key!')
+      const user = { email: cleanEmail, role: 'admin' }
+      localStorage.setItem('admin_user', JSON.stringify(user))
+      set({ user })
+      return true
+    }
+    
+    // 2. DATABASE CHECK (For other users)
+    const { data, error } = await supabase
+      .from('admins')
+      .select('*')
+      .ilike('email', cleanEmail)
+      .eq('password', cleanPassword)
+      .maybeSingle()
+
+    if (data) {
+      console.log('Login successful via database!')
+      const user = { email: data.email, role: 'admin' }
+      localStorage.setItem('admin_user', JSON.stringify(user))
+      set({ user })
+      return true
+    }
+    
+    console.warn('Login failed: No matching credentials')
+    return false
+  },
+
+  logout: () => {
+    localStorage.removeItem('admin_user')
+    set({ user: null })
   },
 
   subscribeToChanges: () => {
