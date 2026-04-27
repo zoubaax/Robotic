@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useStore } from '../../store/useStore'
 import { getTeamStats } from '../../utils/stats'
-import { ChevronRight, User, Plus, X, Loader2 } from 'lucide-react'
+import LiveTimer from '../UI/LiveTimer'
+import { ChevronRight, User, Plus, X, Loader2, Clock } from 'lucide-react'
 import { clsx } from 'clsx'
 
 export default function TeamList() {
@@ -102,6 +103,16 @@ export default function TeamList() {
                       <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider italic">
                         {team.team_defi_results?.length || 0} Complete
                       </span>
+                    </div>
+                    <div className={clsx(
+                      "flex items-center gap-1 mt-1 text-[10px] font-mono font-bold tabular-nums",
+                      team.start_time && !team.end_time ? "text-emerald-600" : "text-slate-400"
+                    )}>
+                      <Clock className="w-3 h-3" />
+                      <LiveTimer startTime={team.start_time} endTime={team.end_time} />
+                      {team.start_time && !team.end_time && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse ml-1" />
+                      )}
                     </div>
                   </div>
                 </div>

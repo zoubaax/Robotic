@@ -73,18 +73,49 @@ export default function DefiModal({ defi, onClose }) {
             <div className="bg-brand-light p-6 rounded border border-slate-200">
               <label className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">
                 <Users className="w-3.5 h-3.5 text-brand-blue" />
-                Visitor Count Metric
+                Nombre de Visiteurs
               </label>
-              <div className="flex items-center gap-4">
+
+              {/* Quick select buttons */}
+              <div className="flex gap-2 mb-4">
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => setVisitors(n)}
+                    className={clsx(
+                      "flex-1 py-2.5 rounded border-2 text-sm font-bold transition-all",
+                      visitors === n
+                        ? "bg-brand-blue text-white border-brand-blue shadow-sm"
+                        : "bg-white text-slate-500 border-slate-200 hover:border-brand-blue/50"
+                    )}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+
+              {/* Manual input with +/- */}
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setVisitors(Math.max(0, visitors - 1))}
+                  className="w-10 h-10 rounded border border-slate-200 bg-white text-slate-500 font-bold text-lg hover:bg-slate-50 transition-colors"
+                >−</button>
                 <input
                   type="number"
                   min="0"
                   value={visitors}
                   onChange={(e) => setVisitors(parseInt(e.target.value) || 0)}
-                  className="w-full bg-white border border-slate-200 rounded px-5 py-3 text-brand-navy focus:outline-none focus:border-brand-blue transition-all text-2xl font-bold text-center"
+                  className="flex-1 bg-white border border-slate-200 rounded px-4 py-2.5 text-brand-navy focus:outline-none focus:border-brand-blue transition-all text-3xl font-bold text-center"
                 />
-                <div className="flex flex-col items-end">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Yield</span>
+                <button
+                  type="button"
+                  onClick={() => setVisitors(visitors + 1)}
+                  className="w-10 h-10 rounded border border-slate-200 bg-white text-slate-500 font-bold text-lg hover:bg-slate-50 transition-colors"
+                >+</button>
+                <div className="flex flex-col items-end min-w-[80px]">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase">Total</span>
                   <span className="text-xl font-bold text-brand-blue">{visitors * 15} pts</span>
                 </div>
               </div>

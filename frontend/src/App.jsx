@@ -6,8 +6,9 @@ import MapUI from './components/Map/MapUI'
 import Leaderboard from './components/Leaderboard/Leaderboard'
 import BonusForm from './components/Dashboard/BonusForm'
 import DefiModal from './components/Modals/DefiModal'
+import DefiList from './components/Dashboard/DefiList'
+import LiveTimer from './components/UI/LiveTimer'
 import { Clock, Play, Square, Trophy, LayoutDashboard, Settings, User } from 'lucide-react'
-import { formatDuration } from './utils/stats'
 import { clsx } from 'clsx'
 
 export default function App() {
@@ -95,8 +96,13 @@ export default function App() {
               <div className="flex items-center gap-6">
                 <div className="flex flex-col items-end">
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Operation Time</span>
-                  <span className="font-mono text-xl font-medium text-brand-navy tabular-nums">
-                    {formatDuration(selectedTeam.start_time, selectedTeam.end_time)}
+                  <span className={clsx(
+                    "font-mono text-xl font-medium tabular-nums",
+                    selectedTeam.start_time && !selectedTeam.end_time
+                      ? "text-emerald-600 animate-pulse"
+                      : "text-brand-navy"
+                  )}>
+                    <LiveTimer startTime={selectedTeam.start_time} endTime={selectedTeam.end_time} />
                   </span>
                 </div>
                 
@@ -153,11 +159,10 @@ export default function App() {
                       Challenge Environment
                     </span>
                   </div>
-                  <div className="h-[500px]">
-                    <MapUI onSelectDefi={setSelectedDefi} />
-                  </div>
+                  <MapUI onSelectDefi={setSelectedDefi} />
                 </div>
-                
+
+
                 <div className="reveal-element delay-200">
                   <BonusForm />
                 </div>
