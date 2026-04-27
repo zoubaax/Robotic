@@ -25,7 +25,7 @@ export const formatDuration = (start, end) => {
   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 }
 
-export const MAX_POINTS = 150
+export const MAX_POINTS = 120
 
 export const getTeamStats = (team) => {
   const results = team.team_defi_results || []

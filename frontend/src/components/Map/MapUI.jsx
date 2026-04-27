@@ -12,8 +12,6 @@ const DEFAULT_POSITIONS = {
   'Vitesse 80':  { x: 46, y: 44 },
   'Visiteur 1':  { x: 40, y: 28 },
   'Visiteur 2':  { x: 35, y: 50 },
-  'Visiteur 3':  { x: 22, y: 45 },
-  'Visiteur 4':  { x: 15, y: 35 },
   "Dos d'âne":   { x: 28, y: 32 },
   'Sable':       { x: 7,  y: 58 },
 }
@@ -107,7 +105,7 @@ export default function MapUI({ onSelectDefi }) {
             <div className="flex items-center gap-1.5 mr-2">
               <Users className="w-3 h-3 text-orange-500" />
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Visiteurs:</span>
-              {[0, 1, 2, 3, 4].map(n => (
+              {[0, 1, 2].map(n => (
                 <button
                   key={n}
                   onClick={() => handleVisitorCount(n)}
@@ -135,7 +133,7 @@ export default function MapUI({ onSelectDefi }) {
             <div className="flex items-center gap-1.5">
               <Users className="w-3 h-3 text-slate-400" />
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Visiteurs:</span>
-              {[0, 1, 2, 3, 4].map(n => (
+              {[0, 1, 2].map(n => (
                 <button
                   key={n}
                   onClick={() => handleVisitorCount(n)}
