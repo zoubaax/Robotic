@@ -19,17 +19,11 @@ const DEFAULT_POSITIONS = {
   'Sable':       { x: 7,  y: 58 },
 }
 
-function loadPositions() {
-  try {
-    const saved = localStorage.getItem('defi_positions')
-    if (saved) return JSON.parse(saved)
-  } catch {}
-  return { ...DEFAULT_POSITIONS }
-}
-
 export default function LivePage() {
-  const { teams, defis, fetchTeams, fetchDefis, fetchLiveState, subscribeToChanges, liveTeamId, visitorCount } = useStore()
-  const [positions] = useState(loadPositions)
+  const { teams, defis, fetchTeams, fetchDefis, fetchLiveState, subscribeToChanges, liveTeamId, visitorCount, markerPositions } = useStore()
+  
+  // Merge default positions with synced ones from DB
+  const positions = { ...DEFAULT_POSITIONS, ...markerPositions }
 
   useEffect(() => {
     fetchTeams()

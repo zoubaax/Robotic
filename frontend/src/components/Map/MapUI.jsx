@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { useStore } from '../../store/useStore'
 import { CheckCircle2, XCircle, Info, Move, Save, X, MapPin, Users } from 'lucide-react'
 import { clsx } from 'clsx'
@@ -18,23 +18,22 @@ const DEFAULT_POSITIONS = {
   'Sable':       { x: 7,  y: 58 },
 }
 
-function loadPositions() {
-  try {
-    const saved = localStorage.getItem('defi_positions')
-    if (saved) return JSON.parse(saved)
-  } catch {}
-  return { ...DEFAULT_POSITIONS }
-}
-
 export default function MapUI({ onSelectDefi }) {
-  const { defis, selectedTeamId, teams, visitorCount, setVisitorCount } = useStore()
+  const { defis, selectedTeamId, teams, visitorCount, setVisitorCount, markerPositions, setMarkerPositions } = useStore()
   const selectedTeam = teams.find(t => t.id === selectedTeamId)
   const results = selectedTeam?.team_defi_results || []
 
   const [calibrating, setCalibrating] = useState(false)
-  const [positions, setPositions] = useState(loadPositions)
+  const [positions, setPositions] = useState({ ...DEFAULT_POSITIONS })
   const [dragging, setDragging] = useState(null)
   const containerRef = useRef(null)
+
+  // Initialize positions from store
+  useEffect(() => {
+    if (markerPositions && Object.keys(markerPositions).length > 0) {
+      setPositions(prev => ({ ...prev, ...markerPositions }))
+    }
+  }, [markerPositions])
 
   const handleVisitorCount = (n) => {
     setVisitorCount(n)
@@ -85,15 +84,14 @@ export default function MapUI({ onSelectDefi }) {
     setPositions(prev => ({ ...prev, [dragging]: { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 } }))
   }, [dragging])
 
-  const savePositions = () => {
-    localStorage.setItem('defi_positions', JSON.stringify(positions))
+  const savePositions = async () => {
+    await setMarkerPositions(positions)
     setCalibrating(false)
-    alert('Positions sauvegardées !')
+    alert('Positions synchronisées en direct !')
   }
 
   const resetPositions = () => {
     setPositions({ ...DEFAULT_POSITIONS })
-    localStorage.removeItem('defi_positions')
   }
 
   return (
