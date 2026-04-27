@@ -27,21 +27,17 @@ function loadPositions() {
 }
 
 export default function MapUI({ onSelectDefi }) {
-  const { defis, selectedTeamId, teams } = useStore()
+  const { defis, selectedTeamId, teams, visitorCount, setVisitorCount } = useStore()
   const selectedTeam = teams.find(t => t.id === selectedTeamId)
   const results = selectedTeam?.team_defi_results || []
 
   const [calibrating, setCalibrating] = useState(false)
   const [positions, setPositions] = useState(loadPositions)
   const [dragging, setDragging] = useState(null)
-  const [visitorCount, setVisitorCount] = useState(() => {
-    return parseInt(localStorage.getItem('visitor_count') || '0')
-  })
   const containerRef = useRef(null)
 
   const handleVisitorCount = (n) => {
     setVisitorCount(n)
-    localStorage.setItem('visitor_count', n.toString())
   }
 
   // Filter défis: hide Visiteur markers beyond the selected count

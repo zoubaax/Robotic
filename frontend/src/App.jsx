@@ -2,24 +2,27 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useStore } from './store/useStore'
 import Login from './components/Auth/Login'
 import Dashboard from './pages/Dashboard'
+import LivePage from './pages/LivePage'
 
 export default function App() {
   const user = useStore(state => state.user)
-  console.log('App user state:', user ? 'Logged In' : 'Logged Out')
 
   return (
     <BrowserRouter>
       <Routes>
-        {/* Redirect based on auth state */}
+        {/* Public: Live competition view */}
+        <Route path="/" element={<LivePage />} />
+
+        {/* Admin login */}
         <Route 
-          path="/" 
+          path="/login" 
           element={!user ? <Login /> : <Navigate to="/dashboard" replace />} 
         />
-        
-        {/* Protected Dashboard Route */}
+
+        {/* Protected dashboard */}
         <Route 
           path="/dashboard" 
-          element={user ? <Dashboard /> : <Navigate to="/" replace />} 
+          element={user ? <Dashboard /> : <Navigate to="/login" replace />} 
         />
 
         {/* Fallback */}

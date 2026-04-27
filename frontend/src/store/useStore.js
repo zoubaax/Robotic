@@ -1,11 +1,20 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 
+// Debounce to prevent 429 (too many requests)
+let fetchTimer = null
+const debouncedFetch = (fn, delay = 1000) => {
+  clearTimeout(fetchTimer)
+  fetchTimer = setTimeout(fn, delay)
+}
+
 export const useStore = create((set, get) => ({
   teams: [],
   defis: [],
   results: [],
   selectedTeamId: null,
+  liveTeamId: null,
+  visitorCount: 0,
   user: JSON.parse(localStorage.getItem('admin_user') || 'null'),
   loading: false,
   error: null,
@@ -44,7 +53,50 @@ export const useStore = create((set, get) => ({
     else set({ defis: data })
   },
 
-  setSelectedTeam: (teamId) => set({ selectedTeamId: teamId }),
+  setSelectedTeam: async (teamId) => {
+    set({ selectedTeamId: teamId })
+    // Broadcast to live page via database
+    console.log('Broadcasting selected team to live:', teamId)
+    const { error } = await supabase
+      .from('live_state')
+      .update({ selected_team_id: teamId, updated_at: new Date().toISOString() })
+      .eq('id', 1)
+    if (error) console.error('Failed to broadcast live state:', error)
+  },
+
+  fetchLiveState: async () => {
+    const { data, error } = await supabase
+      .from('live_state')
+      .select('*')
+      .eq('id', 1)
+      .maybeSingle()
+
+    if (error) {
+      console.error('fetchLiveState error:', error)
+      return
+    }
+
+    if (!data) {
+      // Row doesn't exist yet — create it
+      console.log('Creating live_state row...')
+      await supabase.from('live_state').insert({ id: 1 })
+      return
+    }
+
+    console.log('Live state fetched:', data)
+    set({ 
+      liveTeamId: data.selected_team_id,
+      visitorCount: data.visitor_count || 0
+    })
+  },
+
+  setVisitorCount: async (count) => {
+    set({ visitorCount: count })
+    await supabase
+      .from('live_state')
+      .update({ visitor_count: count, updated_at: new Date().toISOString() })
+      .eq('id', 1)
+  },
 
   updateResult: async (teamId, defiId, status, visitorsCount, points) => {
     const { error } = await supabase
@@ -176,15 +228,16 @@ export const useStore = create((set, get) => ({
   },
 
   subscribeToChanges: () => {
-    const teamsSubscription = supabase
+    const subscription = supabase
       .channel('schema-db-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'teams' }, () => get().fetchTeams())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'team_defi_results' }, () => get().fetchTeams())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'team_bonus' }, () => get().fetchTeams())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'teams' }, () => debouncedFetch(() => get().fetchTeams()))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'team_defi_results' }, () => debouncedFetch(() => get().fetchTeams()))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'team_bonus' }, () => debouncedFetch(() => get().fetchTeams()))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'live_state' }, () => get().fetchLiveState())
       .subscribe()
 
     return () => {
-      supabase.removeChannel(teamsSubscription)
+      supabase.removeChannel(subscription)
     }
   }
 }))

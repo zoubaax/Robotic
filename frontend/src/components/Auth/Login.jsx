@@ -62,7 +62,7 @@ export default function Login() {
               <div className="relative group">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-brand-blue transition-colors" />
                 <input
-                  type="email"
+                  type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-11 py-4 text-brand-navy font-semibold focus:outline-none focus:border-brand-blue focus:bg-white transition-all"
