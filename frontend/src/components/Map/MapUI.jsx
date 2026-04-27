@@ -14,7 +14,7 @@ const DEFAULT_POSITIONS = {
   'Visiteur 2':  { x: 35, y: 50 },
   'Visiteur 3':  { x: 22, y: 45 },
   'Visiteur 4':  { x: 15, y: 35 },
-  'Rocane':      { x: 28, y: 32 },
+  "Dos d'âne":   { x: 28, y: 32 },
   'Sable':       { x: 7,  y: 58 },
 }
 

@@ -20,6 +20,8 @@ export const formatDuration = (start, end) => {
   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 }
 
+export const MAX_POINTS = 150
+
 export const getTeamStats = (team) => {
   const results = team.team_defi_results || []
   const bonus = team.team_bonus?.[0] || { presentation_points: 0, design_points: 0, mission_points: 0 }
@@ -37,6 +39,8 @@ export const getTeamStats = (team) => {
     totalPoints,
     totalTimeMs,
     defiPoints,
-    bonusPoints
+    bonusPoints,
+    maxPoints: MAX_POINTS,
+    percentage: Math.round((totalPoints / MAX_POINTS) * 100)
   }
 }

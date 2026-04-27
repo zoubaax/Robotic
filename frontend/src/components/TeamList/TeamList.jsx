@@ -97,11 +97,11 @@ export default function TeamList() {
                     </h3>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="text-[10px] font-bold text-brand-blue uppercase tracking-wider">
-                        {stats.totalPoints} Points
+                        {stats.totalPoints}/{stats.maxPoints} pts
                       </span>
                       <span className="w-1 h-1 rounded-full bg-slate-300" />
-                      <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider italic">
-                        {team.team_defi_results?.length || 0} Complete
+                      <span className="text-[9px] font-medium text-slate-400 tabular-nums">
+                        {stats.defiPoints} défis + {stats.bonusPoints} bonus
                       </span>
                     </div>
                     <div className={clsx(

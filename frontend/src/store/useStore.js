@@ -11,17 +11,30 @@ export const useStore = create((set, get) => ({
 
   fetchTeams: async () => {
     set({ loading: true })
-    const { data, error } = await supabase
+
+    // Fetch teams with defi results
+    const { data: teamsData, error: teamsError } = await supabase
       .from('teams')
-      .select(`
-        *,
-        team_defi_results(*),
-        team_bonus(*)
-      `)
+      .select('*, team_defi_results(*)')
       .order('name')
-    
-    if (error) set({ error: error.message, loading: false })
-    else set({ teams: data, loading: false })
+
+    // Fetch bonuses separately (join may not work after table recreation)
+    const { data: bonusData } = await supabase
+      .from('team_bonus')
+      .select('*')
+
+    if (teamsError) {
+      set({ error: teamsError.message, loading: false })
+      return
+    }
+
+    // Merge bonus data into teams
+    const teams = (teamsData || []).map(team => {
+      const bonus = (bonusData || []).filter(b => b.team_id === team.id)
+      return { ...team, team_bonus: bonus }
+    })
+
+    set({ teams, loading: false })
   },
 
   fetchDefis: async () => {
@@ -53,18 +66,42 @@ export const useStore = create((set, get) => ({
   },
 
   updateBonus: async (teamId, bonusData) => {
-    const { error } = await supabase
+    const payload = {
+      team_id: teamId,
+      presentation_points: bonusData.presentation_points || 0,
+      design_points: bonusData.design_points || 0,
+      mission_points: bonusData.mission_points || 0
+    }
+    console.log('Saving bonus:', payload)
+
+    const { data, error } = await supabase
       .from('team_bonus')
-      .upsert({
-        team_id: teamId,
-        ...bonusData,
-        updated_at: new Date().toISOString()
-      })
+      .upsert(payload)
+      .select()
+
+    console.log('Bonus save result:', { data, error })
 
     if (error) {
+      console.error('updateBonus error:', error)
       set({ error: error.message })
       return false
     }
+    if (!data || data.length === 0) {
+      console.error('updateBonus: No data returned — write was blocked by RLS')
+      set({ error: 'Write blocked — run GRANT ALL ON team_bonus TO anon; in Supabase SQL' })
+      return false
+    }
+
+    // Update local state immediately with the saved bonus data
+    const teams = get().teams.map(t => {
+      if (t.id === teamId) {
+        return { ...t, team_bonus: [data[0]] }
+      }
+      return t
+    })
+    set({ teams })
+
+    // Also refresh from server
     await get().fetchTeams()
     return true
   },
