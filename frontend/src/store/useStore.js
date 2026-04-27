@@ -19,6 +19,8 @@ export const useStore = create((set, get) => ({
   user: JSON.parse(localStorage.getItem('admin_user') || 'null'),
   loading: false,
   error: null,
+  notification: null, // { message: string, type: 'success' | 'error' }
+  confirmModal: null, // { title: string, message: string, onConfirm: function }
 
   fetchTeams: async () => {
     set({ loading: true })
@@ -169,18 +171,67 @@ export const useStore = create((set, get) => ({
     return true
   },
 
-  updateTeamTime: async (teamId, field, value) => {
+  startTeam: async (teamId) => {
     const { error } = await supabase
       .from('teams')
-      .update({ [field]: value })
+      .update({ 
+        start_time: new Date().toISOString(),
+        end_time: null,
+        paused_at: null,
+        total_paused_ms: 0 
+      })
       .eq('id', teamId)
+    if (!error) await get().fetchTeams()
+  },
 
-    if (error) {
-      set({ error: error.message })
-      return false
-    }
-    await get().fetchTeams()
-    return true
+  pauseTeam: async (teamId) => {
+    const { error } = await supabase
+      .from('teams')
+      .update({ paused_at: new Date().toISOString() })
+      .eq('id', teamId)
+    if (!error) await get().fetchTeams()
+  },
+
+  resumeTeam: async (teamId) => {
+    const team = get().teams.find(t => t.id === teamId)
+    if (!team || !team.paused_at) return
+
+    const pauseDuration = Date.now() - new Date(team.paused_at).getTime()
+    const newTotalPaused = (team.total_paused_ms || 0) + pauseDuration
+
+    const { error } = await supabase
+      .from('teams')
+      .update({ 
+        paused_at: null, 
+        total_paused_ms: newTotalPaused 
+      })
+      .eq('id', teamId)
+    if (!error) await get().fetchTeams()
+  },
+
+  stopTeam: async (teamId) => {
+    const { error } = await supabase
+      .from('teams')
+      .update({ end_time: new Date().toISOString() })
+      .eq('id', teamId)
+    if (!error) await get().fetchTeams()
+  },
+
+  restartTeam: async (teamId) => {
+    const { error } = await supabase
+      .from('teams')
+      .update({ 
+        start_time: null, 
+        end_time: null, 
+        paused_at: null, 
+        total_paused_ms: 0 
+      })
+      .eq('id', teamId)
+    
+    // Also clear défi results for this team when restarting
+    await supabase.from('team_defi_results').delete().eq('team_id', teamId)
+    
+    if (!error) await get().fetchTeams()
   },
 
   addTeam: async (name) => {
@@ -249,5 +300,18 @@ export const useStore = create((set, get) => ({
     return () => {
       supabase.removeChannel(subscription)
     }
+  },
+
+  showNotification: (message, type = 'success') => {
+    set({ notification: { message, type } })
+    setTimeout(() => set({ notification: null }), 3000)
+  },
+
+  askConfirmation: (config) => {
+    set({ confirmModal: config })
+  },
+
+  closeConfirmation: () => {
+    set({ confirmModal: null })
   }
 }))

@@ -19,7 +19,7 @@ const DEFAULT_POSITIONS = {
 }
 
 export default function MapUI({ onSelectDefi }) {
-  const { defis, selectedTeamId, teams, visitorCount, setVisitorCount, markerPositions, setMarkerPositions } = useStore()
+  const { defis, selectedTeamId, teams, visitorCount, setVisitorCount, markerPositions, setMarkerPositions, showNotification } = useStore()
   const selectedTeam = teams.find(t => t.id === selectedTeamId)
   const results = selectedTeam?.team_defi_results || []
 
@@ -87,7 +87,7 @@ export default function MapUI({ onSelectDefi }) {
   const savePositions = async () => {
     await setMarkerPositions(positions)
     setCalibrating(false)
-    alert('Positions synchronisées en direct !')
+    showNotification('Positions synchronisées en direct !')
   }
 
   const resetPositions = () => {

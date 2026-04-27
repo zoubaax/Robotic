@@ -35,7 +35,8 @@ export default function LivePage() {
 
   // Show the team the admin has selected
   const displayTeam = teams.find(t => t.id === liveTeamId)
-  const isRunning = displayTeam?.start_time && !displayTeam?.end_time
+  const isRunning = displayTeam?.start_time && !displayTeam?.end_time && !displayTeam?.paused_at
+  const isPaused = displayTeam?.paused_at
 
   const visibleDefis = defis.filter(d => {
     const match = d.name.match(/^Visiteur\s*(\d+)$/i)
@@ -69,7 +70,7 @@ export default function LivePage() {
           {displayTeam ? (
             <div className="flex flex-col">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
-                {isRunning ? 'Équipe en Course' : 'Équipe Sélectionnée'}
+                {isRunning ? 'Équipe en Course' : isPaused ? 'En Pause' : 'Équipe Sélectionnée'}
               </span>
               <div className="flex items-center gap-2 px-3 py-1 bg-brand-light rounded border border-slate-200">
                 <Users className="w-3 h-3 text-brand-navy" />
@@ -90,13 +91,25 @@ export default function LivePage() {
                   <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">En Direct</span>
                 </div>
               )}
+              {isPaused && (
+                <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-full">
+                  <Clock className="w-3.5 h-3.5 text-amber-600" />
+                  <span className="text-[10px] font-bold text-amber-600 uppercase tracking-wider">En Pause</span>
+                </div>
+              )}
               <div className="flex flex-col items-end">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Chronomètre</span>
                 <span className={clsx(
                   "font-mono text-xl font-medium tabular-nums",
-                  isRunning ? "text-emerald-600 animate-pulse" : "text-brand-navy"
+                  isRunning ? "text-emerald-600 animate-pulse" : 
+                  isPaused ? "text-amber-500" : "text-brand-navy"
                 )}>
-                  <LiveTimer startTime={displayTeam.start_time} endTime={displayTeam.end_time} />
+                  <LiveTimer 
+                    startTime={displayTeam.start_time} 
+                    endTime={displayTeam.end_time}
+                    pausedAt={displayTeam.paused_at}
+                    totalPausedMs={displayTeam.total_paused_ms}
+                  />
                 </span>
               </div>
             </div>

@@ -3,12 +3,15 @@ import { useStore } from './store/useStore'
 import Login from './components/Auth/Login'
 import Dashboard from './pages/Dashboard'
 import LivePage from './pages/LivePage'
+import { GlobalUI } from './components/UI/GlobalUI'
 
 export default function App() {
   const user = useStore(state => state.user)
+  console.log('App user state:', user ? 'Logged In' : 'Logged Out')
 
   return (
     <BrowserRouter>
+      <GlobalUI />
       <Routes>
         {/* Public: Live competition view */}
         <Route path="/" element={<LivePage />} />

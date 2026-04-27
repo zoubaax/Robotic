@@ -20,7 +20,12 @@ export default function Dashboard() {
     fetchTeams, 
     fetchDefis, 
     subscribeToChanges,
-    updateTeamTime,
+    startTeam,
+    pauseTeam,
+    resumeTeam,
+    stopTeam,
+    restartTeam,
+    askConfirmation,
     user,
     logout
   } = useStore()
@@ -97,29 +102,71 @@ export default function Dashboard() {
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Operation Time</span>
                   <span className={clsx(
                     "font-mono text-xl font-medium tabular-nums",
-                    selectedTeam.start_time && !selectedTeam.end_time ? "text-emerald-600 animate-pulse" : "text-brand-navy"
+                    selectedTeam.start_time && !selectedTeam.end_time && !selectedTeam.paused_at ? "text-emerald-600 animate-pulse" : 
+                    selectedTeam.paused_at ? "text-amber-500" : "text-brand-navy"
                   )}>
-                    <LiveTimer startTime={selectedTeam.start_time} endTime={selectedTeam.end_time} />
+                    <LiveTimer 
+                      startTime={selectedTeam.start_time} 
+                      endTime={selectedTeam.end_time}
+                      pausedAt={selectedTeam.paused_at}
+                      totalPausedMs={selectedTeam.total_paused_ms}
+                    />
                   </span>
                 </div>
               </div>
             )}
             
-            <div className="flex items-center gap-3">
-              <button 
-                onClick={() => updateTeamTime(selectedTeamId, 'start_time', new Date().toISOString())}
-                disabled={!selectedTeam || !!selectedTeam.start_time}
-                className="bg-brand-blue text-white px-5 py-2.5 rounded shadow-lg shadow-brand-blue/20 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest hover:bg-brand-blue/90 disabled:opacity-30 disabled:shadow-none transition-all"
-              >
-                Start
-              </button>
-              <button 
-                onClick={() => updateTeamTime(selectedTeamId, 'end_time', new Date().toISOString())}
-                disabled={!selectedTeam || !selectedTeam.start_time || !!selectedTeam.end_time}
-                className="bg-brand-navy text-white px-5 py-2.5 rounded shadow-lg shadow-brand-navy/20 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest hover:bg-slate-800 disabled:opacity-30 disabled:shadow-none transition-all"
-              >
-                Stop
-              </button>
+            <div className="flex items-center gap-2">
+              {!selectedTeam?.start_time && (
+                <button 
+                  onClick={() => startTeam(selectedTeamId)}
+                  disabled={!selectedTeam}
+                  className="bg-brand-blue text-white px-5 py-2.5 rounded shadow-lg shadow-brand-blue/20 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest hover:bg-brand-blue/90 disabled:opacity-30 disabled:shadow-none transition-all"
+                >
+                  Start
+                </button>
+              )}
+
+              {selectedTeam?.start_time && !selectedTeam?.end_time && (
+                <>
+                  {selectedTeam.paused_at ? (
+                    <button 
+                      onClick={() => resumeTeam(selectedTeamId)}
+                      className="bg-emerald-500 text-white px-5 py-2.5 rounded shadow-lg shadow-emerald-500/20 text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-600 transition-all"
+                    >
+                      Resume
+                    </button>
+                  ) : (
+                    <button 
+                      onClick={() => pauseTeam(selectedTeamId)}
+                      className="bg-amber-500 text-white px-5 py-2.5 rounded shadow-lg shadow-amber-500/20 text-[10px] font-bold uppercase tracking-widest hover:bg-amber-600 transition-all"
+                    >
+                      Pause
+                    </button>
+                  )}
+                  <button 
+                    onClick={() => stopTeam(selectedTeamId)}
+                    className="bg-brand-navy text-white px-5 py-2.5 rounded shadow-lg shadow-brand-navy/20 text-[10px] font-bold uppercase tracking-widest hover:bg-slate-800 transition-all"
+                  >
+                    Stop
+                  </button>
+                </>
+              )}
+
+              {selectedTeam?.start_time && (
+                <button 
+                  onClick={() => {
+                    askConfirmation({
+                      title: 'Redémarrer le round ?',
+                      message: 'Voulez-vous vraiment redémarrer ? Cela effacera définitivement les scores de cette équipe pour ce tour.',
+                      onConfirm: () => restartTeam(selectedTeamId)
+                    })
+                  }}
+                  className="bg-white text-slate-400 border border-slate-200 px-4 py-2.5 rounded text-[10px] font-bold uppercase tracking-widest hover:bg-slate-50 transition-all"
+                >
+                  Restart
+                </button>
+              )}
             </div>
           </div>
         </header>
