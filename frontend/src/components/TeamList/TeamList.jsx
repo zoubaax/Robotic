@@ -1,13 +1,68 @@
+import { useState } from 'react'
 import { useStore } from '../../store/useStore'
 import { getTeamStats } from '../../utils/stats'
-import { ChevronRight, User } from 'lucide-react'
+import { ChevronRight, User, Plus, X, Loader2 } from 'lucide-react'
 import { clsx } from 'clsx'
 
 export default function TeamList() {
-  const { teams, selectedTeamId, setSelectedTeam } = useStore()
+  const { teams, selectedTeamId, setSelectedTeam, addTeam } = useStore()
+  const [isAdding, setIsAdding] = useState(false)
+  const [newTeamName, setNewTeamName] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const handleAddTeam = async (e) => {
+    e.preventDefault()
+    if (!newTeamName.trim()) return
+    
+    setLoading(true)
+    const team = await addTeam(newTeamName)
+    if (team) {
+      setNewTeamName('')
+      setIsAdding(false)
+      setSelectedTeam(team.id)
+    }
+    setLoading(false)
+  }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col gap-4">
+      {/* Registration Button/Input */}
+      <div className="flex flex-col">
+        {!isAdding ? (
+          <button 
+            onClick={() => setIsAdding(true)}
+            className="w-full py-4 border-2 border-dashed border-slate-200 rounded flex items-center justify-center gap-2 text-slate-400 hover:text-brand-blue hover:border-brand-blue hover:bg-brand-light/50 transition-all group"
+          >
+            <Plus className="w-4 h-4 transition-transform group-hover:rotate-90" />
+            <span className="text-[10px] font-bold uppercase tracking-widest">Register New Unit</span>
+          </button>
+        ) : (
+          <form onSubmit={handleAddTeam} className="bg-white border border-brand-blue p-4 rounded shadow-lg shadow-brand-blue/5 animate-in slide-in-from-top-2 duration-200">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[9px] font-bold text-brand-blue uppercase tracking-[0.2em]">New Unit Identity</span>
+              <button type="button" onClick={() => setIsAdding(false)} className="text-slate-400 hover:text-rose-500">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex gap-2">
+              <input 
+                autoFocus
+                placeholder="Team Name..."
+                value={newTeamName}
+                onChange={(e) => setNewTeamName(e.target.value)}
+                className="flex-1 bg-brand-light border border-slate-100 rounded px-3 py-2 text-xs font-semibold focus:outline-none focus:border-brand-blue"
+              />
+              <button 
+                disabled={loading || !newTeamName.trim()}
+                className="bg-brand-navy text-white px-3 py-2 rounded text-[10px] font-bold uppercase disabled:opacity-50"
+              >
+                {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Register'}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+
       <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar">
         {teams.map((team, i) => {
           const stats = getTeamStats(team)
@@ -72,3 +127,4 @@ export default function TeamList() {
     </div>
   )
 }
+

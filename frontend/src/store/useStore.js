@@ -83,6 +83,20 @@ export const useStore = create((set, get) => ({
     return true
   },
 
+  addTeam: async (name) => {
+    const { data, error } = await supabase
+      .from('teams')
+      .insert({ name })
+      .select()
+    
+    if (error) {
+      set({ error: error.message })
+      return null
+    }
+    await get().fetchTeams()
+    return data[0]
+  },
+
   subscribeToChanges: () => {
     const teamsSubscription = supabase
       .channel('schema-db-changes')

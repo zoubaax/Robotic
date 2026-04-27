@@ -33,13 +33,13 @@ export default function MapUI({ onSelectDefi }) {
         }} 
       />
       
-      {/* Decorative Blueprint Lines */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-10">
-        <path d="M 15% 20% L 45% 15% L 75% 25% L 80% 60% L 45% 80% L 20% 55% L 50% 45% Z" 
-          fill="none" stroke="#1e3a8a" strokeWidth="1" strokeDasharray="5 5" />
-        <circle cx="15%" cy="20%" r="2" fill="#1e3a8a" />
-        <circle cx="45%" cy="15%" r="2" fill="#1e3a8a" />
-        <circle cx="75%" cy="25%" r="2" fill="#1e3a8a" />
+      {/* Visual paths (decorative) - Technical Blueprint Style */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-10" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <path d="M 15 20 L 45 15 L 75 25 L 80 60 L 45 80 L 20 55 L 50 45 Z" 
+          fill="none" stroke="#1e3a8a" strokeWidth="0.5" strokeDasharray="2 2" />
+        <circle cx="15" cy="20" r="0.8" fill="#1e3a8a" />
+        <circle cx="45" cy="15" r="0.8" fill="#1e3a8a" />
+        <circle cx="75" cy="25" r="0.8" fill="#1e3a8a" />
       </svg>
 
       {/* Defi Markers - Technical Style */}
