@@ -1,6 +1,11 @@
 export const calculatePoints = (defi, status, visitorsCount = 0) => {
   if (status === 'FAIL') return 0
   
+  // If it's one of the map visitors (Visiteur 1, 2, 3, 4), they are 15 points each
+  if (defi.name.toLowerCase().includes('visiteur')) {
+    return 15
+  }
+
   if (defi.type === 'visitor-based') {
     return 15 * (Number(visitorsCount) || 0)
   }

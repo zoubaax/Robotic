@@ -69,7 +69,7 @@ export default function DefiModal({ defi, onClose }) {
             </button>
           </div>
 
-          {defi.type === 'visitor-based' && status === 'PASS' && (
+          {defi.type === 'visitor-based' && !defi.name.toLowerCase().includes('visiteur') && status === 'PASS' && (
             <div className="bg-brand-light p-6 rounded border border-slate-200">
               <label className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">
                 <Users className="w-3.5 h-3.5 text-brand-blue" />
